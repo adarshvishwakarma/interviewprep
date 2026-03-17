@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>10-Day Java Interview Prep Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080810;
+    --surface: #0e0e1a;
+    --surface2: #13131f;
+    --border: #1e1e30;
+    --text: #e8e4f8;
+    --muted: #6b6880;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { min-width: 0; flex: 1; }
+  .topbar-title { font-size: 9px; letter-spacing: 3px; color: var(--muted); font-family: var(--mono); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-heading { font-size: clamp(12px, 3.5vw, 17px); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .reset-btn {
+    background: transparent; border: 1px solid #2a2a3a; color: #555;
+    padding: 6px 10px; border-radius: 4px; cursor: pointer;
+    font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+    white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  }
+  .reset-btn:active { background: #1a1a2e; }
+  .progress-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-label { text-align: right; }
+  .progress-label span { display: block; font-size: 8px; letter-spacing: 1px; color: var(--muted); font-family: var(--mono); margin-bottom: 1px; }
+  .progress-label strong { font-size: 18px; font-weight: 800; line-height: 1; }
+  .ring-circle { width: 38px; height: 38px; position: relative; flex-shrink: 0; }
+  .ring-circle svg { transform: rotate(-90deg); }
+  .ring-circle .ring-bg { fill: none; stroke: var(--border); stroke-width: 3; }
+  .ring-circle .ring-fill { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.4s; }
+  .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-family: var(--mono); font-weight: 700; }
+
+  /* DAY STRIP — horizontal scroll on mobile */
+  .day-strip-wrap {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    position: sticky; top: 61px; z-index: 99;
+  }
+  .day-strip {
+    display: flex; gap: 0;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .day-strip::-webkit-scrollbar { display: none; }
+  .day-pill {
+    flex-shrink: 0; scroll-snap-align: start;
+    background: transparent; border: none; border-bottom: 3px solid transparent;
+    padding: 10px 14px; cursor: pointer; color: #555;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+    transition: all 0.12s; white-space: nowrap; text-align: center;
+    min-width: 56px; -webkit-tap-highlight-color: transparent;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .day-pill .pill-num { font-size: 9px; }
+  .day-pill .pill-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: transparent; transition: background 0.2s;
+  }
+  .day-pill.active { color: var(--text); }
+  .day-pill.has-progress .pill-dot { background: currentColor; opacity: 0.6; }
+
+  /* LAYOUT */
+  .layout { display: flex; max-width: 1120px; margin: 0 auto; padding: 16px 12px; gap: 20px; }
+
+  /* SIDEBAR — desktop only */
+  .sidebar { width: 180px; flex-shrink: 0; }
+  .sidebar-label { font-size: 9px; letter-spacing: 3px; color: #333; font-family: var(--mono); margin-bottom: 10px; }
+  .day-btn {
+    width: 100%; background: transparent; border: 1px solid transparent;
+    border-left: 3px solid #222;
+    border-radius: 4px; padding: 9px 10px; cursor: pointer;
+    text-align: left; transition: all 0.12s; display: block; margin-bottom: 2px;
+    color: var(--text); -webkit-tap-highlight-color: transparent;
+  }
+  .day-btn:hover { background: var(--surface2); }
+  .day-btn.active { background: var(--surface2); }
+  .day-btn .d-num { font-family: var(--mono); font-size: 9px; display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .day-btn .d-name { font-size: 11px; color: #666; line-height: 1.3; }
+  .day-btn.active .d-name { color: var(--text); }
+  .day-btn .d-focus { font-size: 8px; font-family: var(--mono); letter-spacing: 1px; margin-top: 3px; }
+  .day-btn .d-bar { height: 2px; background: var(--border); border-radius: 1px; margin-top: 5px; }
+  .day-btn .d-bar-fill { height: 100%; border-radius: 1px; transition: width 0.3s; }
+
+  /* MAIN */
+  .main { flex: 1; min-width: 0; }
+
+  /* DAY HEADER */
+  .day-header {
+    background: var(--surface);
+    border-radius: 8px; border: 1px solid var(--border);
+    border-top: 3px solid #ccc;
+    padding: 16px 16px; margin-bottom: 12px;
+  }
+  .day-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .day-header-left .day-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .day-num-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; }
+  .day-tag {
+    border-radius: 20px; padding: 2px 9px;
+    font-size: 9px; font-family: var(--mono); letter-spacing: 1px; border: 1px solid;
+  }
+  .day-header h2 { font-size: clamp(17px, 5vw, 22px); font-weight: 700; letter-spacing: -0.3px; }
+  .day-subtitle { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 4px; }
+  .day-tip {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 11px 14px; margin-top: 12px;
+  }
+  .day-tip .tip-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); font-family: var(--mono); margin-bottom: 4px; }
+  .day-tip p { font-size: 12px; color: #999; line-height: 1.6; font-style: italic; }
+
+  /* SLOTS */
+  .slot {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; margin-bottom: 8px; overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .slot-header {
+    width: 100%; background: transparent; border: none;
+    padding: 13px 14px; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    text-align: left; color: var(--text); font-family: var(--sans);
+    -webkit-tap-highlight-color: transparent;
+    min-height: 56px;
+  }
+  .slot-header:active { background: #ffffff05; }
+  .slot-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .slot-icon {
+    width: 36px; height: 36px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-family: var(--mono); font-weight: 700;
+    flex-shrink: 0; border: 1px solid;
+  }
+  .slot-text { min-width: 0; }
+  .slot-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slot-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+  .slot-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 8px; }
+  .slot-done-tag { font-size: 9px; font-family: var(--mono); letter-spacing: 1px; }
+  .slot-prog { width: 44px; height: 3px; background: var(--border); border-radius: 2px; }
+  .slot-prog-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .slot-chevron { font-size: 18px; color: #444; transition: transform 0.2s; display: block; line-height: 1; }
+  .slot.open .slot-chevron { transform: rotate(180deg); }
+
+  /* ITEMS */
+  .slot-body { border-top: 1px solid var(--border); padding: 8px 14px 12px; }
+  .item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 8px; border-radius: 5px; cursor: pointer;
+    margin-bottom: 2px; transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+  }
+  .item:active { background: #ffffff06; }
+  .checkbox {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 1.5px solid #333; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #000;
+    transition: all 0.12s;
+  }
+  .item-text { font-size: 13px; color: #c8c4d8; line-height: 1.55; transition: all 0.12s; }
+  .item.done .item-text { color: #555; text-decoration: line-through; }
+
+  /* NAV */
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-bottom: 24px; }
+  .nav-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: #888; padding: 12px 22px; border-radius: 6px; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+    transition: all 0.12s; min-height: 44px; -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:active:not(:disabled) { border-color: #555; color: var(--text); }
+  .nav-btn:disabled { color: #333; border-color: #1a1a1a; cursor: default; }
+  .nav-btn.next { font-weight: 700; }
+  .nav-counter { font-family: var(--mono); font-size: 11px; color: #444; }
+
+  /* ===== RESPONSIVE ===== */
+  /* Desktop: show sidebar, hide day-strip */
+  @media (min-width: 700px) {
+    .day-strip-wrap { display: none; }
+    .topbar { padding: 14px 24px; }
+    .topbar-heading { font-size: 17px; }
+    .layout { padding: 20px 20px; gap: 22px; }
+    .day-tip { margin-top: 0; max-width: 270px; }
+    .day-header-top { flex-wrap: nowrap; }
+    .slot-title { font-size: 14px; white-space: normal; }
+    .item-text { font-size: 13px; }
+    .slot-header { min-height: auto; }
+  }
+
+  /* Mobile: hide sidebar, show day-strip */
+  @media (max-width: 699px) {
+    .sidebar { display: none; }
+    .layout { padding: 12px 10px; gap: 0; }
+    .day-tip { max-width: 100%; }
+    .topbar-title { display: none; }
+    .slot-prog { display: none; }
+    .slot-done-tag { font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-title">10-DAY INTERVIEW PREP</div>
+    <div class="topbar-heading">Java · Spring Boot · Kafka · System Design</div>
+  </div>
+  <div class="topbar-right">
+    <button class="reset-btn" onclick="resetProgress()">↺ RESET</button>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>PROGRESS</span>
+        <strong id="total-done-display">0</strong>
+      </div>
+      <div class="ring-circle">
+        <svg width="38" height="38" viewBox="0 0 38 38">
+          <circle class="ring-bg" cx="19" cy="19" r="15"/>
+          <circle class="ring-fill" id="ring-fill" cx="19" cy="19" r="15" stroke="#4ECDC4" stroke-dasharray="94.25" stroke-dashoffset="94.25"/>
+        </svg>
+        <div class="ring-pct" id="ring-pct">0%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile day strip -->
+<div class="day-strip-wrap">
+  <div class="day-strip" id="day-strip"></div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">SCHEDULE</div>
+    <div id="sidebar"></div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<script>
+const plan = [
+  {
+    day: 1, label: "Java Foundations", tag: "WARM-UP", accent: "#4ECDC4", hours: "3–4 hrs", focus: "normal",
+    tip: "Day 1 is about recalling, not cramming. You likely know this — just sharpen the edges.",
+    slots: [
+      { time: "H1", title: "Java 8–17 Must-Knows", items: ["Streams & Lambdas: map, filter, reduce, collect", "Optional — avoid NPE patterns", "Records, Sealed Classes, Pattern Matching (Java 16–17)", "var keyword & local type inference"] },
+      { time: "H2", title: "Collections & Internals", items: ["HashMap: hashing, collision, resize (load factor 0.75)", "ConcurrentHashMap vs Collections.synchronizedMap", "LinkedHashMap (LRU cache use-case)", "TreeMap, PriorityQueue for interviews"] },
+      { time: "H3", title: "OOP & Design Patterns", items: ["SOLID principles with Spring examples", "Factory, Singleton, Builder, Strategy, Observer", "Dependency Inversion = basis of Spring DI", "Immutability — why it matters in microservices"] },
+      { time: "H4*", title: "Practice (Optional)", items: ["LeetCode: Two Sum, Group Anagrams, Top K Elements", "Write a Stream pipeline that groups, filters & sorts", "Explain HashMap internals aloud (rubber duck it)"] },
+    ]
+  },
+  {
+    day: 2, label: "Concurrency & JVM", tag: "CORE JAVA", accent: "#FF6B6B", hours: "3–4 hrs", focus: "normal",
+    tip: "CompletableFuture comes up in every senior Java interview. Know the chain methods cold.",
+    slots: [
+      { time: "H1", title: "Threading Fundamentals", items: ["Thread lifecycle: NEW → RUNNABLE → BLOCKED → WAITING → TERMINATED", "Runnable vs Callable vs Future", "ExecutorService: FixedPool, CachedPool, ScheduledPool", "ThreadLocal — per-thread state in Spring request context"] },
+      { time: "H2", title: "Synchronization & Safety", items: ["synchronized vs ReentrantLock vs ReadWriteLock", "volatile: visibility guarantee, not atomicity", "Atomic classes: AtomicInteger, AtomicReference", "Deadlock: causes, detection, avoidance strategies"] },
+      { time: "H3", title: "CompletableFuture & JVM", items: ["CompletableFuture: thenApply, thenCompose, allOf, anyOf", "exceptionally & handle for error recovery", "JVM Memory: Heap (Young/Old Gen), Stack, Metaspace", "GC: G1GC basics, when to tune, common flags"] },
+      { time: "H4*", title: "Practice (Optional)", items: ["Code a producer-consumer with BlockingQueue", "Write async parallel API calls with CompletableFuture.allOf", "Explain what happens when heap fills up"] },
+    ]
+  },
+  {
+    day: 3, label: "Spring Boot Internals", tag: "⚡ FOCUS", accent: "#F7B731", hours: "4 hrs", focus: "weak",
+    tip: "Interviewers LOVE asking 'What happens when Spring Boot starts?' — walk them through it step by step.",
+    slots: [
+      { time: "H1", title: "IoC Container Deep Dive", items: ["BeanFactory vs ApplicationContext differences", "Bean scopes: singleton, prototype, request, session", "Bean lifecycle: @PostConstruct → use → @PreDestroy", "@Component vs @Service vs @Repository vs @Bean — semantic differences"] },
+      { time: "H2", title: "Auto-Configuration Magic", items: ["@SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan", "spring.factories / AutoConfiguration.imports — how Boot finds configs", "@ConditionalOnClass, @ConditionalOnMissingBean, @ConditionalOnProperty", "Build a mini custom auto-configuration (hands-on)"] },
+      { time: "H3", title: "AOP & Transactions", items: ["AOP: Aspect, JoinPoint, Pointcut, Advice (@Before, @After, @Around)", "CGLIB proxy vs JDK dynamic proxy — when each is used", "@Transactional internals — works via AOP proxy", "Propagation: REQUIRED, REQUIRES_NEW, NESTED | Isolation levels"] },
+      { time: "H4", title: "Boot Startup & Actuator", items: ["SpringApplication.run() — step by step startup sequence", "Embedded Tomcat: how it's configured and replaced", "Actuator: /health, /metrics, /env, /beans endpoints", "Custom HealthIndicator & InfoContributor"] },
+    ]
+  },
+  {
+    day: 4, label: "Spring Data & REST", tag: "SPRING", accent: "#45B7D1", hours: "3–4 hrs", focus: "normal",
+    tip: "The N+1 problem is asked in almost every JPA interview. Be ready with a before/after code example.",
+    slots: [
+      { time: "H1", title: "JPA & Hibernate Internals", items: ["Entity lifecycle: Transient → Managed → Detached → Removed", "N+1 problem — identify and fix with @EntityGraph or JOIN FETCH", "Lazy vs Eager loading — when each causes LazyInitializationException", "First-level (Session) vs Second-level cache (Ehcache/Redis)"] },
+      { time: "H2", title: "Spring Data JPA", items: ["Repository hierarchy: CrudRepository → JpaRepository → PagingAndSortingRepository", "Derived query methods vs @Query (JPQL & native)", "Specifications for dynamic queries", "Projections (Interface & DTO) to avoid over-fetching"] },
+      { time: "H3", title: "REST API Best Practices", items: ["Proper HTTP methods, status codes, error response structure", "Validation: @Valid, @NotNull, @Size, custom ConstraintValidator", "Exception handling: @ControllerAdvice + @ExceptionHandler", "API versioning strategies (URL, header, media type)"] },
+      { time: "H4*", title: "Practice (Optional)", items: ["Find N+1 in a bidirectional entity relationship and fix it", "Write a @ControllerAdvice with proper error response DTO", "Implement pagination + sorting endpoint with Pageable"] },
+    ]
+  },
+  {
+    day: 5, label: "Microservices Patterns", tag: "ARCHITECTURE", accent: "#A29BFE", hours: "3–4 hrs", focus: "normal",
+    tip: "When asked about microservices, always mention trade-offs. Distributed = complexity. Show you understand the cost.",
+    slots: [
+      { time: "H1", title: "Core Microservice Patterns", items: ["API Gateway: routing, rate limiting, auth delegation (Spring Cloud Gateway)", "Service Discovery: Eureka client/server, heartbeat, self-preservation", "Circuit Breaker: Resilience4j CLOSED → OPEN → HALF-OPEN states", "Bulkhead & Rate Limiter patterns with Resilience4j"] },
+      { time: "H2", title: "Distributed Data Patterns", items: ["Saga pattern: Choreography vs Orchestration with examples", "CQRS: separate read/write models, projections", "Outbox pattern: reliable event publishing with DB transaction", "Event Sourcing basics — when to use and trade-offs"] },
+      { time: "H3", title: "Inter-service Communication", items: ["Sync: REST vs gRPC (proto, bidirectional streaming)", "Async: Event-driven via Kafka — decoupling benefits", "Correlation ID & distributed tracing (Micrometer + Zipkin)", "Idempotency: why critical, how to implement (idempotency keys)"] },
+      { time: "H4*", title: "Practice (Optional)", items: ["Whiteboard: design an order service using Saga choreography", "Explain how you'd handle partial failure in a distributed transaction", "Walk through your own microservices project architecture"] },
+    ]
+  },
+  {
+    day: 6, label: "Kafka Deep Dive", tag: "⚡ FOCUS", accent: "#FD79A8", hours: "4 hrs", focus: "weak",
+    tip: "Know the difference between at-least-once and exactly-once, and what trade-offs each brings in your system.",
+    slots: [
+      { time: "H1", title: "Kafka Core Concepts", items: ["Topics, Partitions, Offsets — the holy trinity", "Brokers, Leaders, ISR (In-Sync Replicas), replication factor", "Consumer Groups: partition assignment, one partition per consumer", "Consumer Group rebalancing: triggers, impact, how to minimize"] },
+      { time: "H2", title: "Producers & Consumers", items: ["Producer acks: 0 (fire-forget), 1 (leader), all (ISR) — trade-offs", "Idempotent producer: enable.idempotence=true, exactly-once", "Consumer offset management: auto-commit vs manual commit", "At-least-once vs at-most-once vs exactly-once semantics"] },
+      { time: "H3", title: "Spring Kafka", items: ["@KafkaListener — concurrency, partitions, groupId", "KafkaTemplate.send() — async with CompletableFuture", "Error handling: DefaultErrorHandler, retry with BackOff", "Dead Letter Topic (DLT) pattern: @DltHandler, routing on failure"] },
+      { time: "H4", title: "Advanced Kafka", items: ["Log compaction: compacted topics for state", "Kafka Streams: KStream, KTable, stateful operations (joins, aggregations)", "Schema Registry + Avro: why schema evolution matters", "Monitoring: consumer lag, under-replicated partitions, ISR shrink alert"] },
+    ]
+  },
+  {
+    day: 7, label: "System Design — Basics", tag: "⚡ FOCUS", accent: "#55EFC4", hours: "4 hrs", focus: "weak",
+    tip: "Use the 5-step framework every single time. Interviewers reward structure over 'right answers'.",
+    slots: [
+      { time: "H1", title: "Design Foundations", items: ["CAP Theorem: CP vs AP systems, real examples (Zookeeper=CP, Cassandra=AP)", "PACELC: extends CAP with latency trade-off", "Horizontal vs vertical scaling, stateless services", "Load balancing: round-robin, least-connections, consistent hashing"] },
+      { time: "H2", title: "Caching & Storage", items: ["Cache strategies: Cache-aside, Write-through, Write-behind, Read-through", "Redis: String, Hash, List, Set, Sorted Set — when to use each", "Cache invalidation: TTL, event-driven invalidation, cache stampede", "DB: Indexing (B-tree, composite), sharding strategies, read replicas"] },
+      { time: "H3", title: "Design Framework (Memorize!)", items: ["Step 1: Clarify requirements (functional + non-functional)", "Step 2: Estimate scale (QPS, storage, bandwidth)", "Step 3: High-level design (boxes & arrows)", "Step 4: Deep dive on bottlenecks → Step 5: Trade-offs discussion"] },
+      { time: "H4", title: "Design: URL Shortener (Timed 45min)", items: ["Requirements: shorten URL, redirect, analytics", "DB schema, ID generation (base62 encoding)", "Caching strategy for hot URLs", "Scale: handle 100K writes/sec — what breaks first?"] },
+    ]
+  },
+  {
+    day: 8, label: "System Design — Real Systems", tag: "⚡ FOCUS", accent: "#FDCB6E", hours: "4 hrs", focus: "weak",
+    tip: "In system design, your communication matters as much as correctness. Think out loud always.",
+    slots: [
+      { time: "H1", title: "Design: Notification Service", items: ["Fan-out problem: push vs pull model", "Kafka as event bus: topic per notification type vs single topic", "Rate limiting per user, retry with exponential backoff", "Multi-channel: push, email, SMS — pluggable channel pattern"] },
+      { time: "H2", title: "Design: Rate Limiter", items: ["Algorithms: Token Bucket, Leaky Bucket, Fixed Window, Sliding Window", "Redis-based distributed rate limiter (INCR + EXPIRE)", "Per-user vs per-IP vs per-API-key granularity", "Handling rate limit headers (X-RateLimit-Remaining)"] },
+      { time: "H3", title: "Design: Event-Driven Order System", items: ["Order → Kafka → Inventory, Payment, Notification services", "Saga choreography flow with compensating transactions", "Outbox pattern to guarantee event publishing", "Idempotent consumers: deduplication with Redis or DB"] },
+      { time: "H4", title: "Review & Compare", items: ["Re-read your Day 7 notes — consolidate the framework", "Pick one system you've built at work — explain it as a design question", "Practice estimating: '1M users, 10% DAU, each sends 5 msgs/day = ?'", "Write trade-offs for: Kafka vs RabbitMQ vs AWS SQS"] },
+    ]
+  },
+  {
+    day: 9, label: "Security, DevOps & Revision", tag: "CONSOLIDATE", accent: "#74B9FF", hours: "3–4 hrs", focus: "normal",
+    tip: "Day 9 is revision, not new learning. Consolidate > cram. Quality over quantity.",
+    slots: [
+      { time: "H1", title: "Spring Security & JWT", items: ["SecurityFilterChain: filter order, OncePerRequestFilter", "JWT: header.payload.signature, validation, refresh token strategy", "OAuth2 Resource Server with Spring Boot", "Method-level security: @PreAuthorize, @Secured, @RolesAllowed"] },
+      { time: "H2", title: "Docker & Kubernetes", items: ["Multi-stage Dockerfile for Spring Boot (minimize image size)", "K8s: Deployment, Service, ConfigMap, Secret, HPA", "Liveness vs Readiness probes — how Spring Actuator integrates", "Zero-downtime: rolling update vs blue-green vs canary"] },
+      { time: "H3", title: "Revision Blitz", items: ["Redo your weakest flashcards (Spring Boot startup, Kafka offsets)", "Write 5 STAR stories from your 3 years of experience", "Review @Transactional propagation table from memory", "Review Kafka producer ack modes from memory"] },
+      { time: "H4*", title: "Mock Q&A (Optional)", items: ["'Walk me through Spring Boot auto-configuration'", "'How does Kafka ensure message ordering?'", "'Design a system to process 1M events/day'", "'Difference between Saga choreography and orchestration?'"] },
+    ]
+  },
+  {
+    day: 10, label: "Mock Interview Day", tag: "FINAL DAY", accent: "#E17055", hours: "3–4 hrs", focus: "final",
+    tip: "Your 3 years of real experience is your biggest advantage. Anchor every answer in actual work you've done.",
+    slots: [
+      { time: "H1", title: "DSA Warm-up + Review", items: ["Solve 2 medium LeetCode problems (Arrays/HashMap/Sliding Window)", "Review: Collections, Streams, Concurrency — 1 concept each", "No new learning — confidence building only", "Read through your STAR stories once more"] },
+      { time: "H2", title: "Full System Design Mock (45 min)", items: ["Design: real-time chat system OR e-commerce checkout", "Time yourself: use the 5-step framework strictly", "Record or write it out — review for gaps", "Check: did you cover scale, failure scenarios, trade-offs?"] },
+      { time: "H3", title: "Behavioral + HR Prep", items: ["STAR stories: conflict, a failure, a technical decision you drove", "'Why are you looking to switch?' — crisp, positive answer", "Questions to ask interviewer: deployment frequency, tech debt, team structure", "'Tell me about yourself' — 90-second impact version"] },
+      { time: "H4*", title: "Final Checklist", items: ["Spring Boot startup sequence — say it in 60 seconds?", "Kafka exactly-once — can you explain it simply?", "One design pattern per domain: Saga, CQRS, Outbox, Circuit Breaker", "Sleep early. You're ready. 🎯"] },
+    ]
+  },
+];
+
+// STATE — persisted via localStorage
+const STORAGE_KEY = 'java-interview-prep-v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { activeDay: 0, checked: {} };
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ activeDay, checked }));
+  } catch(e) {}
+}
+
+const saved = loadState();
+let activeDay = saved.activeDay || 0;
+let checked = saved.checked || {};
+let openSlot = null;
+
+function totalItems() { return plan.reduce((s, d) => s + d.slots.reduce((ss, sl) => ss + sl.items.length, 0), 0); }
+function totalDone() { return Object.values(checked).filter(Boolean).length; }
+function dayTotal(di) { return plan[di].slots.reduce((s, sl) => s + sl.items.length, 0); }
+function dayDone(di) { return plan[di].slots.reduce((s, sl, si) => s + sl.items.filter((_, ii) => checked[`${di}-${si}-${ii}`]).length, 0); }
+function slotDone(di, si) { return plan[di].slots[si].items.filter((_, ii) => checked[`${di}-${si}-${ii}`]).length; }
+
+function updateTopbar() {
+  const done = totalDone(), total = totalItems();
+  document.getElementById('total-done-display').textContent = `${done}/${total}`;
+  const pct = total ? done / total : 0;
+  const circ = 2 * Math.PI * 15;
+  const fill = document.getElementById('ring-fill');
+  fill.style.strokeDasharray = circ;
+  fill.style.strokeDashoffset = circ - (pct * circ);
+  fill.style.stroke = plan[activeDay].accent;
+  document.getElementById('ring-pct').textContent = Math.round(pct * 100) + '%';
+  document.getElementById('ring-pct').style.color = plan[activeDay].accent;
+}
+
+function renderDayStrip() {
+  const strip = document.getElementById('day-strip');
+  if (!strip) return;
+  strip.innerHTML = plan.map((p, i) => {
+    const done = dayDone(i);
+    const isActive = i === activeDay;
+    return `<button class="day-pill${isActive ? ' active' : ''}${done > 0 ? ' has-progress' : ''}"
+      onclick="switchDay(${i})"
+      style="color:${isActive ? p.accent : '#555'}; border-bottom-color:${isActive ? p.accent : 'transparent'}">
+      <span class="pill-num">D${p.day}</span>
+      <span class="pill-dot" style="background:${done > 0 ? p.accent : 'transparent'}; opacity:${isActive ? 1 : 0.5}"></span>
+    </button>`;
+  }).join('');
+  // Scroll active pill into view
+  const active = strip.querySelector('.day-pill.active');
+  if (active) active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+}
+
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = plan.map((p, i) => {
+    const done = dayDone(i), total = dayTotal(i);
+    const pct = total ? (done / total) * 100 : 0;
+    const isActive = i === activeDay;
+    return `<button class="day-btn${isActive ? ' active' : ''}" onclick="switchDay(${i})"
+      style="border-left-color: ${isActive ? p.accent : (done > 0 ? p.accent + '55' : '#222')}; ${isActive ? `border-color: ${p.accent}25; border-left-color: ${p.accent};` : ''}">
+      <div class="d-num" style="color: ${isActive ? p.accent : '#555'}">
+        <span>DAY ${p.day}</span>${done > 0 ? `<span>${done}/${total}</span>` : ''}
+      </div>
+      <div class="d-name">${p.label}</div>
+      ${p.focus === 'weak' ? `<div class="d-focus" style="color:${p.accent}">FOCUS</div>` : ''}
+      ${done > 0 ? `<div class="d-bar"><div class="d-bar-fill" style="width:${pct}%; background:${p.accent}"></div></div>` : ''}
+    </button>`;
+  }).join('');
+}
+
+function renderMain() {
+  const p = plan[activeDay];
+  const done = dayDone(activeDay), total = dayTotal(activeDay);
+  const tagBg = p.focus === 'weak' ? `${p.accent}20` : p.focus === 'final' ? '#E1705520' : '#ffffff08';
+  const tagColor = p.focus === 'weak' ? p.accent : p.focus === 'final' ? '#E17055' : '#888';
+
+  const slotsHtml = p.slots.map((slot, si) => {
+    const sd = slotDone(activeDay, si), st = slot.items.length;
+    const pct = st ? (sd / st) * 100 : 0;
+    const isOpen = openSlot === si;
+    const itemsHtml = slot.items.map((item, ii) => {
+      const key = `${activeDay}-${si}-${ii}`;
+      const done = checked[key];
+      return `<div class="item${done ? ' done' : ''}" onclick="toggleItem(${si},${ii})">
+        <div class="checkbox" style="border-color:${done ? p.accent : '#333'}; background:${done ? p.accent : 'transparent'}">
+          ${done ? '✓' : ''}
+        </div>
+        <div class="item-text">${item}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="slot${isOpen ? ' open' : ''}" id="slot-${si}" style="${isOpen ? `border-color: ${p.accent}35` : ''}">
+      <button class="slot-header" onclick="toggleSlot(${si})">
+        <div class="slot-left">
+          <div class="slot-icon" style="background:${p.accent}15; border-color:${p.accent}30; color:${p.accent}">${slot.time}</div>
+          <div class="slot-text">
+            <div class="slot-title">${slot.title}</div>
+            <div class="slot-sub">${sd}/${st} completed</div>
+          </div>
+        </div>
+        <div class="slot-right">
+          ${sd === st && sd > 0 ? `<span class="slot-done-tag" style="color:${p.accent}">✓ DONE</span>` : ''}
+          <div class="slot-prog"><div class="slot-prog-fill" style="width:${pct}%; background:${p.accent}"></div></div>
+          <span class="slot-chevron">⌄</span>
+        </div>
+      </button>
+      ${isOpen ? `<div class="slot-body">${itemsHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="day-header" style="border-top-color: ${p.accent}; border-color: ${p.accent}20">
+      <div class="day-header-top">
+        <div class="day-header-left">
+          <div class="day-meta">
+            <span class="day-num-badge" style="color:${p.accent}">DAY ${p.day}</span>
+            <span class="day-tag" style="background:${tagBg}; border-color:${tagColor}55; color:${tagColor}">${p.tag}</span>
+          </div>
+          <h2>${p.label}</h2>
+          <div class="day-subtitle">⏱ ${p.hours} &nbsp;·&nbsp; ${done}/${total} topics done</div>
+        </div>
+      </div>
+      <div class="day-tip">
+        <div class="tip-label">💡 DAILY TIP</div>
+        <p>${p.tip}</p>
+      </div>
+    </div>
+    ${slotsHtml}
+    <div class="nav">
+      <button class="nav-btn" onclick="switchDay(${activeDay - 1})" ${activeDay === 0 ? 'disabled' : ''}>← PREV</button>
+      <span class="nav-counter">${activeDay + 1} / 10</span>
+      <button class="nav-btn next" onclick="switchDay(${activeDay + 1})" ${activeDay === 9 ? 'disabled' : ''}
+        style="${activeDay !== 9 ? `background:${p.accent}; border-color:${p.accent}; color:#000` : ''}">NEXT →</button>
+    </div>
+  `;
+}
+
+function render() { renderSidebar(); renderDayStrip(); renderMain(); updateTopbar(); }
+
+function switchDay(i) {
+  if (i < 0 || i > 9) return;
+  activeDay = i; openSlot = null; render(); saveState();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleSlot(si) {
+  openSlot = openSlot === si ? null : si;
+  renderMain(); updateTopbar();
+}
+
+function toggleItem(si, ii) {
+  const key = `${activeDay}-${si}-${ii}`;
+  checked[key] = !checked[key];
+  render(); saveState();
+}
+
+function resetProgress() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  checked = {}; activeDay = 0; openSlot = null;
+  saveState(); render();
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
